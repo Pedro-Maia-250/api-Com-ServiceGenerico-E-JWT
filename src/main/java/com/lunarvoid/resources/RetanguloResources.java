@@ -17,15 +17,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.lunarvoid.dto.RetanguloDTOA;
 import com.lunarvoid.dto.RetanguloDTOR;
-import com.lunarvoid.entities.Retangulo;
-import com.lunarvoid.services.FormaService;
+import com.lunarvoid.services.RetanguloService;
 
 @RestController
 @RequestMapping(value = "/retangulos")
 public class RetanguloResources {
     
     @Autowired
-    private FormaService<Retangulo,Long,RetanguloDTOR,RetanguloDTOA> service;
+    private RetanguloService service;
 
     @GetMapping
     public ResponseEntity<List<RetanguloDTOR>> fidAll(){

@@ -17,15 +17,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.lunarvoid.dto.QuadradoDTOA;
 import com.lunarvoid.dto.QuadradoDTOR;
-import com.lunarvoid.entities.Quadrado;
-import com.lunarvoid.services.FormaService;
+import com.lunarvoid.services.QuadradoService;
 
 @RestController
 @RequestMapping(value = "/quadrados")
 public class QuadradoResources {
     
     @Autowired
-    private FormaService<Quadrado,Long,QuadradoDTOR,QuadradoDTOA> service;
+    private QuadradoService service;
 
     @GetMapping
     public ResponseEntity<List<QuadradoDTOR>> fidAll(){

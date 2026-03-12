@@ -17,15 +17,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.lunarvoid.dto.CirculoDTOA;
 import com.lunarvoid.dto.CirculoDTOR;
-import com.lunarvoid.entities.Circulo;
-import com.lunarvoid.services.FormaService;
+import com.lunarvoid.services.CirculoService;
 
 @RestController
 @RequestMapping(value = "/circulos")
 public class CirculoResources {
     
     @Autowired
-    private FormaService<Circulo,Long,CirculoDTOR,CirculoDTOA> service;
+    private CirculoService service;
 
     @GetMapping
     public ResponseEntity<List<CirculoDTOR>> fidAll(){
