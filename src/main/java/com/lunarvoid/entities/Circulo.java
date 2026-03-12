@@ -1,5 +1,6 @@
 package com.lunarvoid.entities;
 
+import com.lunarvoid.dto.CirculoDTOR;
 import com.lunarvoid.enums.TipoFormas;
 
 import jakarta.persistence.Entity;
@@ -7,7 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_circulo")
-public class Circulo extends Forma {
+public class Circulo extends Forma<CirculoDTOR> {
 
     private Double diametro;
 
@@ -35,6 +36,10 @@ public class Circulo extends Forma {
 
     public Double getDiametro() {
         return diametro;
+    }
+
+    public CirculoDTOR convert(){
+        return new CirculoDTOR(this);
     }
     
 }

@@ -1,5 +1,6 @@
 package com.lunarvoid.entities;
 
+import com.lunarvoid.dto.QuadradoDTOR;
 import com.lunarvoid.enums.TipoFormas;
 
 import jakarta.persistence.Entity;
@@ -7,7 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_quadrado")
-public class Quadrado extends Forma {
+public class Quadrado extends Forma<QuadradoDTOR>{
     private Double lado;
 
     protected Quadrado(){
@@ -33,5 +34,9 @@ public class Quadrado extends Forma {
 
     public Double getLado() {
         return lado;
+    }
+
+    public QuadradoDTOR convert(){
+        return new QuadradoDTOR(this);
     }
 }

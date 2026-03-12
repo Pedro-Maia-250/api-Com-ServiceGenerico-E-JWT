@@ -1,5 +1,6 @@
 package com.lunarvoid.entities;
 
+import com.lunarvoid.interfaces.Convertible;
 import com.lunarvoid.interfaces.FormaInterface;
 
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,7 @@ import java.io.Serializable;
 import com.lunarvoid.enums.TipoFormas;
 
 @MappedSuperclass
-public abstract class Forma implements FormaInterface, Serializable {
+public abstract class Forma<T> implements FormaInterface, Serializable, Convertible<T> {
 
     private static final long serialVersionUID = 1L;
 

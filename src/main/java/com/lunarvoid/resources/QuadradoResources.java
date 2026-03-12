@@ -15,24 +15,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.lunarvoid.dto.QuadradoDTOA;
+import com.lunarvoid.dto.QuadradoDTOR;
 import com.lunarvoid.entities.Quadrado;
-import com.lunarvoid.services.QuadradoService;
-
+import com.lunarvoid.services.FormaService;
 
 @RestController
 @RequestMapping(value = "/quadrados")
 public class QuadradoResources {
     
     @Autowired
-    private QuadradoService service;
+    private FormaService<Quadrado,Long,QuadradoDTOR,QuadradoDTOA> service;
 
     @GetMapping
-    public ResponseEntity<List<Quadrado>> fidAll(){
+    public ResponseEntity<List<QuadradoDTOR>> fidAll(){
         return ResponseEntity.ok().body(service.findAll());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Quadrado> fidAll(@PathVariable Long id){
+    public ResponseEntity<QuadradoDTOR> fidAll(@PathVariable Long id){
         return ResponseEntity.ok().body(service.findbyId(id));
     }
 
@@ -43,15 +44,15 @@ public class QuadradoResources {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Quadrado> update(@PathVariable Long id, @RequestBody Quadrado obj){
+    public ResponseEntity<QuadradoDTOR> update(@PathVariable Long id, @RequestBody QuadradoDTOA obj){
         return ResponseEntity.ok().body(service.update(obj, id));
     }
 
     @PostMapping
-    public ResponseEntity<Quadrado> insert(@RequestBody Quadrado obj){
-        obj = service.insert(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<QuadradoDTOR> insert(@RequestBody QuadradoDTOA obj){
+        QuadradoDTOR DTOR = service.insert(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(DTOR.getId()).toUri();
+        return ResponseEntity.created(uri).body(DTOR);
     }
 
     @GetMapping("/{id}/perimetro")

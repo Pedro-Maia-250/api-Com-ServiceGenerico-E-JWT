@@ -15,23 +15,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.lunarvoid.dto.CirculoDTOA;
+import com.lunarvoid.dto.CirculoDTOR;
 import com.lunarvoid.entities.Circulo;
-import com.lunarvoid.services.CirculoService;
+import com.lunarvoid.services.FormaService;
 
 @RestController
 @RequestMapping(value = "/circulos")
 public class CirculoResources {
     
     @Autowired
-    private CirculoService service;
+    private FormaService<Circulo,Long,CirculoDTOR,CirculoDTOA> service;
 
     @GetMapping
-    public ResponseEntity<List<Circulo>> fidAll(){
+    public ResponseEntity<List<CirculoDTOR>> fidAll(){
         return ResponseEntity.ok().body(service.findAll());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Circulo> fidAll(@PathVariable Long id){
+    public ResponseEntity<CirculoDTOR> fidAll(@PathVariable Long id){
         return ResponseEntity.ok().body(service.findbyId(id));
     }
 
@@ -42,15 +44,15 @@ public class CirculoResources {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Circulo> update(@PathVariable Long id, @RequestBody Circulo obj){
+    public ResponseEntity<CirculoDTOR> update(@PathVariable Long id, @RequestBody CirculoDTOA obj){
         return ResponseEntity.ok().body(service.update(obj, id));
     }
 
     @PostMapping
-    public ResponseEntity<Circulo> insert(@RequestBody Circulo obj){
-        obj = service.insert(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<CirculoDTOR> insert(@RequestBody CirculoDTOA obj){
+        CirculoDTOR DTOR = service.insert(obj);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(DTOR.getId()).toUri();
+        return ResponseEntity.created(uri).body(DTOR);
     }
 
     @GetMapping("/{id}/perimetro")

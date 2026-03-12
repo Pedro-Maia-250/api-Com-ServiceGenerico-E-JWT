@@ -1,5 +1,6 @@
 package com.lunarvoid.entities;
 
+import com.lunarvoid.dto.RetanguloDTOR;
 import com.lunarvoid.enums.TipoFormas;
 
 import jakarta.persistence.Entity;
@@ -7,7 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_retangulo")
-public class Retangulo extends Forma {
+public class Retangulo extends Forma<RetanguloDTOR> {
     private Double lado1;
     private Double lado2;
 
@@ -41,5 +42,7 @@ public class Retangulo extends Forma {
         return ((this.lado1 * 2) + (this.lado2 * 2));
     }
 
-
+    public RetanguloDTOR convert(){
+        return new RetanguloDTOR(this);
+    }
 }
