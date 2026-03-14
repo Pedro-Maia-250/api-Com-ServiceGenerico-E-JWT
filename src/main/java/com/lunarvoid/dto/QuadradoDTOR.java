@@ -25,11 +25,6 @@ public class QuadradoDTOR {
         this.tipo = Quadrado.getTipo();
     }
 
-    public Quadrado toEntity(){
-        Quadrado Quadrado = new Quadrado(this.lado);
-        return Quadrado;
-    }
-
     public Long getId() {
         return id;
     }

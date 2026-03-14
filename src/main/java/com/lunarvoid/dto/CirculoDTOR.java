@@ -25,11 +25,6 @@ public class CirculoDTOR {
         this.tipo = circulo.getTipo();
     }
 
-    public Circulo toEntity(){
-        Circulo circulo = new Circulo(this.diametro);
-        return circulo;
-    }
-
     public Long getId() {
         return id;
     }

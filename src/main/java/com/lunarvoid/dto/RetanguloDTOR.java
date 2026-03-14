@@ -27,11 +27,6 @@ public class RetanguloDTOR {
         this.tipo = Retangulo.getTipo();
     }
 
-    public Retangulo toEntity(){
-        Retangulo Retangulo = new Retangulo(this.lado1, this.lado2);
-        return Retangulo;
-    }
-
     public Long getId() {
         return id;
     }

@@ -22,6 +22,6 @@ public enum TipoFormas {
             }
         }
 
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Codigo de enum errado");
     }
 }

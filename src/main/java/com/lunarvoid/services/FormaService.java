@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 
 import com.lunarvoid.dto.DTOA;
 import com.lunarvoid.entities.*;
