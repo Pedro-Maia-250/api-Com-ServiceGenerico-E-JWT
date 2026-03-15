@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService{
 
     public void registrarCli(UserDTOA DTOA){
         if(repository.findByUsername(DTOA.username()).isPresent()){
-            throw new DTOAException("Usuario já existe");
+            throw new DTOAException("esse nome de usuario já existe");
         }else{
             String encipString = new BCryptPasswordEncoder().encode(DTOA.password());
             repository.save(new User(DTOA.username(), encipString, UserRoles.CLI));
@@ -36,11 +36,11 @@ public class UserService implements UserDetailsService{
 
     public void registrar(RegistroUserDTOA DTOA){
         if(repository.findByUsername(DTOA.username()).isPresent()){
-            throw new DTOAException("Usuario já existe");
+            throw new DTOAException("esse nome de usuario já existe");
         }else{
             String encipString = new BCryptPasswordEncoder().encode(DTOA.password());
             repository.save(new User(DTOA.username(), encipString, DTOA.roles()));
         }
     }
-    
+ 
 }
