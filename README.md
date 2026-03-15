@@ -1,137 +1,123 @@
-# lunarJWTESG
+# API JWT Servico Generico (lunarJWTESG)
 
-> Implementacao da camada de persistencia utilizando Spring Data JPA.
+API em Spring Boot 4 para CRUD de formas geometricas (circulos, quadrados e retangulos) com autenticacao stateless via JWT e controle de acesso por roles.
 
-Esta branch demonstra a aplicacao da arquitetura base utilizando:
+## Sumario
+- Visao geral
+- Tecnologias
+- Dominio
+- Seguranca (JWT + roles)
+- Endpoints
+- Como rodar
+- Configuracoes
+- Exemplos rapidos
+- Licenca
 
-- Spring Boot (Web + Data JPA)
-- Spring Data JPA, Jakarta Persistence, MySQL Connector/J
-- MySQL (configurado por `application.properties` + profile `dev`)
+## Visao geral
+- Servico generico: interface `FormaService` centraliza CRUD, calculo de area/perimetro e conversao DTO/entidade.
+- Autenticacao JWT com `java-jwt` e filtro customizado (`SecurityFilter`) para povoar o `SecurityContext`.
+- Roles: `CLI`, `FUNC`, `ADMIN` controlam quem pode criar/editar/excluir recursos.
+- Documentacao em runtime pelo Springdoc: `/swagger-ui/index.html` e `/v3/api-docs`.
 
----
+## Tecnologias
+- Java 21
+- Spring Boot 4.0.2 (Web, WebMVC, Data JPA, Security)
+- JWT (com.auth0:java-jwt)
+- MySQL
+- Springdoc OpenAPI 3
+- Maven
 
-## Objetivo desta Implementacao
+## Dominio
+Formas compartilham a classe base `Forma` e um enum `TipoFormas`:
+- `Circulo` (diametro)
+- `Quadrado` (lado)
+- `Retangulo` (lado1, lado2)
 
-Esta versao resolve a exposicao do dominio de formas geometricas como API REST,
-com operacoes CRUD e endpoints de calculo (area/perimetro).
+Diagrama de dominio (assets):
+![Diagrama de dominio](assets/diagrama-de-dominio-D.H.S.png)
 
-A tecnologia foi escolhida para acelerar produtividade com repositorios JPA,
-organizacao em camadas e padronizacao de tratamento de erros HTTP.
+## Seguranca (JWT + roles)
+- Login gera token com emissor `JWT-APP` e expiracao de 2h.
+- Header: `Authorization: Bearer {token}`.
+- Rotas liberadas: `POST /auth/login`, `POST /auth/user` e `GET /v3/api-docs`.
+- Regras por role:
+  - `ADMIN`: POST /circulos|quadrados|retangulos, DELETE /circulos|quadrados|retangulos, POST /auth/user/adm.
+  - `FUNC`: PUT /circulos|quadrados|retangulos.
+  - Qualquer role autenticada: GET em todos os recursos e calculos de area/perimetro.
+  - Qualquer outra rota exige autenticacao.
+- Para criar o primeiro ADMIN caso o banco esteja vazio, insira direto no banco ou libere temporariamente o endpoint `/auth/user/adm`.
 
-O foco arquitetural e separar claramente interface HTTP, regras de aplicacao
-e acesso a dados com Spring Boot.
+## Endpoints
+### Autenticacao
+- `POST /auth/login` - body `{ "username": "...", "password": "..." }` -> `{ "token": "..." }`
+- `POST /auth/user` - cria usuario com role `CLI` (publico)
+- `POST /auth/user/adm` - cria usuario com role informado (requer ADMIN) - body `{ "username": "...", "password": "...", "roles": "ADMIN|FUNC|CLI" }`
 
----
+### Formas (todas requerem token)
+#### Padrao de payload
+- Circulo: `{ "diametro": 10 }`
+- Quadrado: `{ "lado": 5 }`
+- Retangulo: `{ "lado1": 4, "lado2": 6 }`
 
-## Estrutura de Camadas
+#### Operacoes por recurso
+- `GET /{forma}s` - lista todos
+- `GET /{forma}s/{id}` - busca por id
+- `POST /{forma}s` - cria (ADMIN)
+- `PUT /{forma}s/{id}` - atualiza (FUNC)
+- `DELETE /{forma}s/{id}` - remove (ADMIN)
+- `GET /{forma}s/{id}/area` - calcula area
+- `GET /{forma}s/{id}/perimetro` - calcula perimetro
 
-Entities  
-Services  
-DAO / Repository  
-Controller / Resource
+Substitua `{forma}` por `circulos`, `quadrados` ou `retangulos`.
 
-Aplicacao nesta versao:
+## Como rodar
+Pre-requisitos: Java 21, Maven, MySQL em execucao.
 
-- `src/main/java/com/lunarvoid/entities`: entidades de dominio (`Forma`, `Circulo`, `Quadrado`, `Retangulo`)
-- `src/main/java/com/lunarvoid/repositories`: repositorios JPA por entidade
-- `src/main/java/com/lunarvoid/services`: servicos com regras de aplicacao e operacoes CRUD
-- `src/main/java/com/lunarvoid/resources`: endpoints REST (`/circulos`, `/quadrados`, `/retangulos`, `/formas`)
-- `src/main/java/com/lunarvoid/resources/exceptions`: handler global de excecoes e payload padrao de erro
+1. Crie o banco `lunarJWTESG_db`.
+2. Ajuste credenciais e segredo JWT em `src/main/resources/application-dev.properties`.
+3. Rode a aplicacao (perfil `dev` ja esta ativo em `application.properties`):
+   ```bash
+   mvn spring-boot:run
+   ```
+   No PowerShell:
+   ```powershell
+   mvn spring-boot:run
+   ```
+4. Acesse Swagger em `http://localhost:8080/swagger-ui/index.html`.
 
----
+## Configuracoes
+`src/main/resources/application-dev.properties` (padrao):
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/lunarJWTESG_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+token.secret=<defina-um-segredo>
+```
+- Modifique `token.secret` para um valor seguro antes de subir em producao.
+- Banco e credenciais podem ser trocados conforme ambiente.
 
-## Modelagem de Dominio
-
-O dominio base permanece o mesmo:
-
-- Forma (classe abstrata)
-- Circulo
-- Quadrado
-- Retangulo
-- TipoFormas (enum)
-
-Adaptacoes para persistencia:
-
-- `Forma` esta como `@MappedSuperclass`, compartilhando `id` e `tipo`
-- Subclasses sao entidades JPA com tabelas proprias (`tb_circulo`, `tb_quadrado`, `tb_retangulo`)
-- O enum `TipoFormas` e armazenado pelo codigo numerico em `Forma`
-
----
-
-## Estrategia de Persistencia
-
-- Persistencia via `JpaRepository` (`save`, `findAll`, `findById`, `deleteById`)
-- Mapeamento objeto-relacional feito com anotacoes JPA nas entidades
-- Conexao e propriedades gerenciadas pelo Spring Boot (`application.properties` e profile ativo)
-- Uso de ORM (Hibernate via Spring Data JPA), sem SQL manual na camada de aplicacao
-
----
-
-## Principais Caracteristicas Tecnicas
-
-- [ ] Controle manual de conexao
-- [x] Uso de ORM
-- [x] Injecao de dependencia
-- [x] Transacoes automaticas
-- [ ] Queries customizadas
-- [x] Separacao clara entre dominio e infraestrutura
-
----
-
-## Vantagens desta Abordagem
-
-- Alta produtividade para evolucao de endpoints e persistencia
-- Menos codigo repetitivo com repositorios Spring Data
-- Tratamento centralizado de erros da API
-- Estrutura pronta para crescimento em modulos REST
-
----
-
-## Limitacoes ou Desafios
-
-- Dependencia maior de framework e convencoes Spring
-- Necessidade de configurar corretamente ambiente e profile de banco
-- Comportamentos de ORM (lazy loading, flush, etc.) exigem atencao em cenarios avancados
-- `application.properties` ativa profile `dev`, mas o arquivo `application-dev.properties` precisa existir e estar consistente no projeto
-
----
-
-## Como Executar
-
-### 1. Clonar o repositorio e acessar a branch
-
+## Exemplos rapidos
+### Login
 ```bash
-git clone <url-do-repositorio>
-cd projeto-hibernate-dao-api
-git checkout api
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{\"username\":\"user\",\"password\":\"senha\"}'
 ```
 
-### 2. Configurar banco de dados (profile dev)
-
-Garanta que o arquivo `src/main/resources/application-dev.properties` esteja configurado com:
-
-- URL JDBC
-- usuario
-- senha
-- estrategia JPA/Hibernate desejada
-
-### 3. Executar a aplicacao
-
+### Criar circulo (ADMIN)
 ```bash
-mvn clean spring-boot:run
+curl -X POST http://localhost:8080/circulos \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{\"diametro\":12}'
 ```
 
-A aplicacao sobe por padrao em `http://localhost:8080`.
+### Listar quadrados (qualquer role autenticada)
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:8080/quadrados
+```
 
-### 4. Endpoints principais
-
-- `GET /formas`
-- `GET, POST, PUT, DELETE /circulos`
-- `GET /circulos/{id}/area`
-- `GET /circulos/{id}/perimetro`
-- `GET, POST, PUT, DELETE /quadrados`
-- `GET /quadrados/{id}/area`
-- `GET /quadrados/{id}/perimetro`
-- `GET, POST, PUT, DELETE /retangulos`
-- `GET /retangulos/{id}/area`
-- `GET /retangulos/{id}/perimetro`
+## Licenca
+MIT - veja `LICENSE`.
